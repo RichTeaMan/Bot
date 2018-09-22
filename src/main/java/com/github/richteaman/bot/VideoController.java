@@ -3,8 +3,8 @@ package com.github.richteaman.bot;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.ds.v4l4j.V4l4jDriver;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -36,23 +36,18 @@ public class VideoController {
         webcam.open();
     }
 
-    @GetMapping(path = "/plain", produces = "video/mp4")
-    @ResponseBody
-    public FileSystemResource plain() {
-
-        return new FileSystemResource("D:/Projects/Bot/Test.mp4");
-    }
-
     @GetMapping(path = "/cam", produces = "image/jpg")
     @ResponseBody
-    public ByteArrayResource cam(@RequestHeader HttpHeaders headers)
+    public ResponseEntity<ByteArrayResource> cam(@RequestHeader HttpHeaders headers)
             throws IOException {
 
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ImageIO.write(webcam.getImage(), "JPG", byteArrayOutputStream);
+        ByteArrayResource byteArrayResource = new ByteArrayResource(byteArrayOutputStream.toByteArray());
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(webcam.getImage(), "JPG", baos);
-
-        return new ByteArrayResource(baos.toByteArray());
+        return ResponseEntity.ok()
+                .header("Cache-Control", "no-cache, no-store, must-revalidate")
+                .body(byteArrayResource);
     }
 
 }
