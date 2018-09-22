@@ -19,7 +19,10 @@ import java.io.IOException;
 public class VideoController {
 
     static {
-        Webcam.setDriver(new V4l4jDriver());
+        String arch = System.getProperty("os.arch");
+        if (arch.contains("arm")) {
+            Webcam.setDriver(new V4l4jDriver());
+        }
     }
 
     private Webcam webcam = Webcam.getDefault();
