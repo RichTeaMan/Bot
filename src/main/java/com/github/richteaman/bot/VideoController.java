@@ -1,6 +1,7 @@
 package com.github.richteaman.bot;
 
 import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.ds.v4l4j.V4l4jDriver;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
@@ -16,6 +17,10 @@ import java.io.IOException;
 
 @Controller
 public class VideoController {
+
+    static {
+        Webcam.setDriver(new V4l4jDriver());
+    }
 
     private Webcam webcam = Webcam.getDefault();
 
