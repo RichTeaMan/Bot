@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
@@ -57,5 +58,14 @@ public class GpioRestController {
         System.out.println("Exiting ControlGpioExample");
 
         return "hellgpio";
+    }
+
+    @GetMapping(path="/pwm1")
+    @ResponseBody
+    public String UpdatePwm(@RequestParam("pwm") int pwm) {
+
+        gpioService.getPwm1().setPwm(pwm);
+        Integer result =  gpioService.getPwm1().getPwm();
+        return result.toString();
     }
 }

@@ -18,6 +18,8 @@ private GpioController gpioController;
 
     private GpioPinDigitalOutput pin1;
 
+    private GpioPinPwmOutput pwm1;
+
     @PostConstruct
     public void init() {
 
@@ -25,6 +27,11 @@ private GpioController gpioController;
 
         pin1 = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_01, "MyLED", PinState.HIGH);
         pin1.setShutdownOptions(true, PinState.LOW);
+
+        pwm1 = gpioController.provisionPwmOutputPin(RaspiPin.GPIO_23);
+        pwm1.setPwm(0);
+        pwm1.setPwmRange(1000);
+
     }
 
     @PreDestroy
@@ -38,5 +45,9 @@ private GpioController gpioController;
 
     public GpioPinDigitalOutput getPin1() {
         return pin1;
+    }
+
+    public GpioPinPwmOutput getPwm1() {
+        return pwm1;
     }
 }
