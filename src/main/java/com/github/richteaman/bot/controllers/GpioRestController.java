@@ -62,10 +62,29 @@ public class GpioRestController {
 
     @GetMapping(path="/pwm1")
     @ResponseBody
-    public String UpdatePwm(@RequestParam("pwm") int pwm) {
+    public String UpdatePwm1(@RequestParam("pwm") int pwm) {
 
         gpioService.getPwm1().setPwm(pwm);
         Integer result =  gpioService.getPwm1().getPwm();
         return result.toString();
+    }
+
+    @GetMapping(path="/pwm2")
+    @ResponseBody
+    public String UpdatePwm2(@RequestParam("pwm") int pwm) {
+
+        gpioService.getPwm2().setPwm(pwm);
+        Integer result =  gpioService.getPwm2().getPwm();
+        return result.toString();
+    }
+
+    @GetMapping(path="/pwm")
+    @ResponseBody
+    public String UpdatePwm(@RequestParam("pwm") int pwm) {
+
+        String pwm1 = UpdatePwm1(pwm);
+        String pwm2 = UpdatePwm2(pwm);
+
+        return String.format("%s|%s", pwm1, pwm2);
     }
 }

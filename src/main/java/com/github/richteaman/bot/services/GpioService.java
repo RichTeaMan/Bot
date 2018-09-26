@@ -16,21 +16,32 @@ public class GpioService {
 
 private GpioController gpioController;
 
+    private GpioPinDigitalOutput pin0;
+
     private GpioPinDigitalOutput pin1;
 
     private GpioPinPwmOutput pwm1;
+
+    private GpioPinPwmOutput pwm2;
 
     @PostConstruct
     public void init() {
 
         gpioController = GpioFactory.getInstance();
 
-        pin1 = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_01, "MyLED", PinState.HIGH);
+        pin0 = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_00, "LeftForward", PinState.HIGH);
+        pin0.setShutdownOptions(true, PinState.LOW);
+
+        pin1 = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_01, "RightForward", PinState.HIGH);
         pin1.setShutdownOptions(true, PinState.LOW);
 
         pwm1 = gpioController.provisionPwmOutputPin(RaspiPin.GPIO_23);
         pwm1.setPwm(0);
         pwm1.setPwmRange(1000);
+
+        pwm2 = gpioController.provisionPwmOutputPin(RaspiPin.GPIO_26);
+        pwm2.setPwm(0);
+        pwm2.setPwmRange(1000);
 
     }
 
@@ -49,5 +60,9 @@ private GpioController gpioController;
 
     public GpioPinPwmOutput getPwm1() {
         return pwm1;
+    }
+
+    public GpioPinPwmOutput getPwm2() {
+        return pwm2;
     }
 }
