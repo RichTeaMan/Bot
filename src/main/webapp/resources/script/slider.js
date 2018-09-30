@@ -100,10 +100,10 @@ function writePwm(position) {
   var x = position.x - hWidth
 
   if (x > 0) {
-    left = ((hWidth - x) / hWidth) * mag;
+    right = ((hWidth - x) / hWidth) * mag;
   }
   if (x < 0) {
-    right = ((hWidth + x) / hWidth) * mag;
+    left = ((hWidth + x) / hWidth) * mag;
   }
   $("#pwm").html(`Left: ${left} Right: ${right}`);
   updateLeftMotor(left);
