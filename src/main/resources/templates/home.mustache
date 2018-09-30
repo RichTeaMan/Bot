@@ -1,6 +1,22 @@
 {{#layout}}
     <div id="contents">
-        <img id="videoImg" />
+        <img id="videoImg" style="float: left" />
+
+        <div style="float: left">
+            <div id="widget">
+                <div id="markerbounds">
+                    <div id="box">
+                        <div id="marker"></div>
+                    </div>
+                </div>
+                <div>
+                    <p id="coord"></p>
+                </div>
+                <div>
+                    <p id="pwm"></p>
+                </div>
+            </div>
+        </div>
     </div>
     <div>
         <input type="range" id="fpsRangeInput" min="0" max="100" value="15" onchange="createVideoStream(this.value);">
@@ -22,22 +38,6 @@
             <h3>Both Motors</h3>
             <input type="range" id="bothMotorRangeInput" min="-1000" max="1000" value="15" onchange="updateInput('bothMotorTextInput', this.value); updateLeftMotor(this.value); updateRightMotor(this.value);">
             <input type="number" id="bothMotorTextInput" value="15" onchange="updateInput('bothMotorRangeInput', this.value); updateLeftMotor(this.value); updateRightMotor(this.value);">
-        </div>
-    </div>
-
-    <div>
-        <div id="widget">
-            <div id="markerbounds">
-                <div id="box">
-                    <div id="marker"></div>
-                </div>
-            </div>
-            <div>
-                <p id="coord"></p>
-            </div>
-            <div>
-                <p id="pwm"></p>
-            </div>
         </div>
     </div>
 
