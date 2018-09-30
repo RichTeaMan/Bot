@@ -64,18 +64,36 @@ public class GpioRestController {
     @ResponseBody
     public String UpdatePwm1(@RequestParam("pwm") int pwm) {
 
-        gpioService.getPwm1().setPwm(pwm);
-        Integer result =  gpioService.getPwm1().getPwm();
-        return result.toString();
+        gpioService.getPin0().setState(PinState.LOW);
+        gpioService.getPin3().setState(PinState.LOW);
+
+        if (pwm > 0) {
+            gpioService.getPin0().setState(PinState.HIGH);
+        } else if (pwm < 0) {
+            gpioService.getPin3().setState(PinState.HIGH);
+        }
+        int modulatedPwm = Math.abs(pwm);
+
+        gpioService.getPwm1().setPwm(modulatedPwm);
+        return "OK";
     }
 
     @GetMapping(path="/pwm2")
     @ResponseBody
     public String UpdatePwm2(@RequestParam("pwm") int pwm) {
 
-        gpioService.getPwm2().setPwm(pwm);
-        Integer result =  gpioService.getPwm2().getPwm();
-        return result.toString();
+        gpioService.getPin1().setState(PinState.LOW);
+        gpioService.getPin4().setState(PinState.LOW);
+
+        if (pwm > 0) {
+            gpioService.getPin1().setState(PinState.HIGH);
+        } else if (pwm < 0) {
+            gpioService.getPin4().setState(PinState.HIGH);
+        }
+        int modulatedPwm = Math.abs(pwm);
+
+        gpioService.getPwm2().setPwm(modulatedPwm);
+        return "OK";
     }
 
     @GetMapping(path="/pwm")

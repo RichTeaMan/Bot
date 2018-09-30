@@ -20,6 +20,10 @@ private GpioController gpioController;
 
     private GpioPinDigitalOutput pin1;
 
+    private GpioPinDigitalOutput pin3;
+
+    private GpioPinDigitalOutput pin4;
+
     private GpioPinPwmOutput pwm1;
 
     private GpioPinPwmOutput pwm2;
@@ -34,6 +38,12 @@ private GpioController gpioController;
 
         pin1 = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_01, "RightForward", PinState.HIGH);
         pin1.setShutdownOptions(true, PinState.LOW);
+
+        pin3 = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_03, "LeftBackward", PinState.HIGH);
+        pin3.setShutdownOptions(true, PinState.LOW);
+
+        pin4 = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_04, "RightBackward", PinState.HIGH);
+        pin4.setShutdownOptions(true, PinState.LOW);
 
         pwm1 = gpioController.provisionPwmOutputPin(RaspiPin.GPIO_23);
         pwm1.setPwm(0);
@@ -54,8 +64,20 @@ private GpioController gpioController;
         return gpioController;
     }
 
+    public GpioPinDigitalOutput getPin0() {
+        return pin0;
+    }
+
     public GpioPinDigitalOutput getPin1() {
         return pin1;
+    }
+
+    public GpioPinDigitalOutput getPin3() {
+        return pin3;
+    }
+
+    public GpioPinDigitalOutput getPin4() {
+        return pin4;
     }
 
     public GpioPinPwmOutput getPwm1() {
