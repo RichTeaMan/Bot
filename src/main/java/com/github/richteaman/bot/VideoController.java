@@ -49,7 +49,7 @@ public class VideoController {
                 }
             }
         }
-        if (null != videoException) {
+        if (null != videoException || webcam == null) {
             throw new IllegalStateException("Cannot instantiate video.", videoException);
         }
 

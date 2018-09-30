@@ -11,6 +11,36 @@ function createVideoStream(fps) {
     updateInput('fpsRangeInput', fps);
 }
 
+function updateLeftMotor(speed) {
+    var speedInt = parseInt(speed, 10);
+
+    if (!isNaN(speedInt)) {
+        updateInput('leftMotorTextInput', speedInt);
+        updateInput('leftMotorRangeInput', speedInt);
+
+        $.get(`/pwm1?pwm=${speedInt}`)
+        .fail(function(data) {
+            console.log("Failed to update left motor:");
+            console.log(data);
+        });
+    }
+}
+
+function updateRightMotor(speed) {
+    var speedInt = parseInt(speed, 10);
+
+    if (!isNaN(speedInt)) {
+        updateInput('rightMotorTextInput', speedInt);
+        updateInput('rightMotorRangeInput', speedInt);
+
+        $.get(`/pwm2?pwm=${speedInt}`)
+        .fail(function(data) {
+            console.log("Failed to update right motor:");
+            console.log(data);
+        });
+    }
+}
+
 function fetchVideoImage(destinationElementId) {
     $(`#${destinationElementId}`).attr("src", "/cam?" + new Date().getTime());
 }

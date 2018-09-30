@@ -3,12 +3,33 @@
         <img id="videoImg" />
     </div>
     <div>
-        <input type="range" id="fpsRangeInput" min="0" max="100" value="15" onchange="updateInput('fpsTextInput', this.value); createVideoStream(this.value);">
-        <input type="number" id="fpsTextInput" value="15" onchange="updateInput('fpsRangeInput', this.value); createVideoStream(this.value);">
+        <input type="range" id="fpsRangeInput" min="0" max="100" value="15" onchange="createVideoStream(this.value);">
+        <input type="number" id="fpsTextInput" value="15" onchange="createVideoStream(this.value);">
+    </div>
+
+    <div>
+        <div id="leftMotorPanel" style="float: left;">
+            <h3>Left Motor</h3>
+            <input type="range" id="leftMotorRangeInput" min="0" max="1000" value="15" onchange="updateLeftMotor(this.value);">
+            <input type="number" id="leftMotorTextInput" value="15" onchange="updateLeftMotor(this.value);">
+        </div>
+        <div id="rightMotorPanel" style="float: left;">
+            <h3>Right Motor</h3>
+            <input type="range" id="rightMotorRangeInput" min="0" max="1000" value="15" onchange="updateRightMotor(this.value);">
+            <input type="number" id="rightMotorTextInput" value="15" onchange="updateRightMotor(this.value);">
+        </div>
+        <div id="bothMotorPanel" style="float: left;">
+            <h3>Both Motors</h3>
+            <input type="range" id="bothMotorRangeInput" min="0" max="1000" value="15" onchange="updateInput('bothMotorTextInput', this.value); updateLeftMotor(this.value); updateRightMotor(this.value);">
+            <input type="number" id="bothMotorTextInput" value="15" onchange="updateInput('bothMotorRangeInput', this.value); updateLeftMotor(this.value); updateRightMotor(this.value);">
+        </div>
     </div>
 
     <script>
         createVideoStream(5);
+
+        updateLeftMotor(0);
+        updateRightMotor(0);
     </script>
 {{/layout}}
 {{>layout}}
