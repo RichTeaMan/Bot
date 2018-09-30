@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
@@ -18,22 +20,48 @@ import java.io.IOException;
 @Controller
 public class VideoController {
 
-    static {
+    private Webcam webcam;
+
+    @PostConstruct
+    public void init() {
+
         String arch = System.getProperty("os.arch");
         if (arch.contains("arm")) {
             Webcam.setDriver(new V4l4jDriver());
         }
-    }
 
-    private Webcam webcam = Webcam.getDefault();
+        int attemptLimit = 10;
+        Exception videoException = null;
 
-    public VideoController() {
+        for(int attempt = 0; attempt < attemptLimit; attempt++) {
 
+            videoException = null;
+            try {
+                webcam = Webcam.getDefault();
+                break;
+            }
+            catch(Exception ex) {
+                videoException = ex;
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+        }
+        if (null != videoException) {
+            throw new IllegalStateException("Cannot instantiate video.", videoException);
+        }
 
-        Dimension dimension = new Dimension(320, 240);
+        Dimension dimension = new Dimension(640, 480);
         webcam.setViewSize(dimension);
 
         webcam.open();
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        webcam.close();
     }
 
     @GetMapping(path = "/cam", produces = "image/jpg")
