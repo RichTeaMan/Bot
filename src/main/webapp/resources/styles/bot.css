@@ -1,0 +1,26 @@
+#markerbounds {
+  margin: auto;
+  position: relative;
+}
+
+#box {
+  margin: auto;
+  background-color: lightsteelblue;
+  position: absolute;
+}
+
+#marker {
+  position: relative;
+  background-color: brown;
+  border-radius: 100px;
+}
+
+#coord {
+  font-family: serif;
+  font-size: 14px;
+  margin: 0px;
+}
+
+#widget {
+  border: 1px solid black;
+}
