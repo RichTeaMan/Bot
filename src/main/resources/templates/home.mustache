@@ -2,9 +2,13 @@
     <div id="contents">
         <img id="videoImg" />
     </div>
+    <div>
+        <input type="range" id="fpsRangeInput" min="0" max="100" value="15" onchange="updateInput('fpsTextInput', this.value); createVideoStream(this.value);">
+        <input type="number" id="fpsTextInput" value="15" onchange="updateInput('fpsRangeInput', this.value); createVideoStream(this.value);">
+    </div>
 
     <script>
-        beginVideo();
+        createVideoStream(5);
     </script>
 {{/layout}}
 {{>layout}}
