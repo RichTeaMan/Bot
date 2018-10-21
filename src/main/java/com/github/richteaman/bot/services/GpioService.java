@@ -1,12 +1,8 @@
 package com.github.richteaman.bot.services;
 
+import com.github.richteaman.bot.SpeedMonitor;
 import com.pi4j.io.gpio.*;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -24,9 +20,13 @@ private GpioController gpioController;
 
     private GpioPinDigitalOutput pin4;
 
+    private GpioPinDigitalInput pin25;
+
     private GpioPinPwmOutput pwm1;
 
     private GpioPinPwmOutput pwm2;
+
+    private SpeedMonitor speedMonitor = new SpeedMonitor();
 
     @PostConstruct
     public void init() {
@@ -44,6 +44,11 @@ private GpioController gpioController;
 
         pin4 = gpioController.provisionDigitalOutputPin(RaspiPin.GPIO_04, "RightBackward", PinState.HIGH);
         pin4.setShutdownOptions(true, PinState.LOW);
+
+        pin25 = gpioController.provisionDigitalInputPin(RaspiPin.GPIO_25, PinPullResistance.PULL_DOWN);
+        pin25.setShutdownOptions(true);
+
+        pin25.addListener(speedMonitor);
 
         pwm1 = gpioController.provisionPwmOutputPin(RaspiPin.GPIO_23);
         pwm1.setPwm(0);
@@ -86,5 +91,10 @@ private GpioController gpioController;
 
     public GpioPinPwmOutput getPwm2() {
         return pwm2;
+    }
+
+
+    public SpeedMonitor getSpeedMonitor() {
+        return speedMonitor;
     }
 }
