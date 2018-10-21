@@ -4,7 +4,9 @@ import com.github.richteaman.bot.controllers.GpioRestController;
 import com.github.richteaman.bot.services.GpioService;
 import com.github.richteaman.bot.services.PidController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SpeedControlThread extends Thread {
 
     private double requiredSpeed = 2.0;
