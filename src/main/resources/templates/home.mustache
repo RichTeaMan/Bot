@@ -39,6 +39,10 @@
             <input type="range" id="bothMotorRangeInput" min="-1000" max="1000" value="15" onchange="updateInput('bothMotorTextInput', this.value); updateLeftMotor(this.value); updateRightMotor(this.value);">
             <input type="number" id="bothMotorTextInput" value="15" onchange="updateInput('bothMotorRangeInput', this.value); updateLeftMotor(this.value); updateRightMotor(this.value);">
         </div>
+
+        <div>
+            <h3>Revs:</h3>
+            <div id="revs"></div>
     </div>
 
     <script>

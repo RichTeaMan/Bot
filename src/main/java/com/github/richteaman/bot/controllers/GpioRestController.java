@@ -105,4 +105,13 @@ public class GpioRestController {
 
         return String.format("%s|%s", pwm1, pwm2);
     }
+
+    @GetMapping(path="/revs1")
+    @ResponseBody
+    public String FetchRevs() {
+
+        double revs = gpioService.getSpeedMonitor().getRevsPerSecond();
+
+        return String.valueOf(revs);
+    }
 }

@@ -43,6 +43,16 @@ function updateRightMotor(speed) {
 
 function fetchVideoImage(destinationElementId) {
     $(`#${destinationElementId}`).attr("src", "/cam?" + new Date().getTime());
+
+    $.get(`/revs1`)
+    .done(function(data) {
+        console.log(data);
+        $("#revs").text(data);
+    })
+    .fail(function(data) {
+        console.log("Failed to get revs:");
+        console.log(data);
+    });
 }
 
 function updateInput(textInput, val) {
