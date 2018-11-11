@@ -79,6 +79,14 @@ $("#marker").draggable({
     writePwm(slider.get_position());
     slider.display_position();
   },
+  revert: function() {
+
+    var pos = slider.get_position();
+    pos.y = 7.5;
+    pos.x = 7.5;
+    writePwm(pos);
+    return true;
+  }
 });
 
 //syntax for rendering is:
