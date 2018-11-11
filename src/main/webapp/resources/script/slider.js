@@ -85,7 +85,7 @@ $("#marker").draggable({
 //  slider.render(width, height, width-range, height-range, marker size, output decimal places)
 var height = 400;
 var width = 400;
-slider.draw(height,width,1000,1000,20,2);
+slider.draw(height,width,15,15,20,2);
 var marker_pos = $('#marker');
 marker_pos.css('top', (slider.height - slider.marker_size) / 2);
 marker_pos.css('left', (slider.width - slider.marker_size) / 2);
@@ -106,6 +106,6 @@ function writePwm(position) {
     left = ((hWidth + x) / hWidth) * mag;
   }
   $("#pwm").html(`Left: ${left} Right: ${right}`);
-  updateLeftMotor(left);
-  updateRightMotor(right);
+  updateTargetSpeedLeftMotor(left);
+  updateTargetSpeedRightMotor(right);
 }

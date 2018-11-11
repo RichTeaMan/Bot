@@ -41,6 +41,32 @@ function updateRightMotor(speed) {
     }
 }
 
+function updateTargetSpeedLeftMotor(speed) {
+    var speedFloat = parseFloat(speed);
+
+    if (!isNaN(speedFloat)) {
+
+        $.get(`/targetLeftSpeed?speed=${speedFloat}`)
+        .fail(function(data) {
+            console.log("Failed to update left motor:");
+            console.log(data);
+        });
+    }
+}
+
+function updateTargetSpeedRightMotor(speed) {
+    var speedFloat = parseFloat(speed);
+
+    if (!isNaN(speedFloat)) {
+
+        $.get(`/targetRightSpeed?speed=${speedFloat}`)
+        .fail(function(data) {
+            console.log("Failed to update right motor:");
+            console.log(data);
+        });
+    }
+}
+
 function updatePidController(target, kp, ki, kd) {
     $.get(`/updatePidController?target=${target}&kp=${kp}&ki=${ki}&kd=${kd}`)
     .fail(function(data) {

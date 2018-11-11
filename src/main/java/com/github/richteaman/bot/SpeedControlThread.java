@@ -14,9 +14,9 @@ public class SpeedControlThread extends Thread {
     /** Logger. */
     private final static Logger logger = LoggerFactory.getLogger(SpeedControlThread.class);
 
-    private double requiredSpeedLeftWheel = 3.5;
+    private double requiredSpeedLeftWheel = 0.0;
 
-    private double requiredSpeedRightWheel = 3.5;
+    private double requiredSpeedRightWheel = 0.0;
 
     private int sleepTime = 1;
 
@@ -128,6 +128,14 @@ public class SpeedControlThread extends Thread {
         int modulatedPwm = Math.abs(pwm);
 
         gpioService.getPwm2().setPwm(modulatedPwm);
+    }
+
+    public double getRequiredSpeedLeftWheel() {
+        return requiredSpeedLeftWheel;
+    }
+
+    public void setRequiredSpeedLeftWheel(double requiredSpeedLeftWheel) {
+        this.requiredSpeedLeftWheel = requiredSpeedLeftWheel;
     }
 
     public double getRequiredSpeedRightWheel() {

@@ -103,6 +103,24 @@ public class GpioRestController {
         return "OK";
     }
 
+    @GetMapping(path="/targetLeftSpeed")
+    @ResponseBody
+    public String updateTargetLeftSpeed(@RequestParam("speed") double speed) {
+
+        logger.debug("Setting left wheel target speed: {}", speed);
+        speedControlThread.setRequiredSpeedLeftWheel(speed);
+        return "OK";
+    }
+
+    @GetMapping(path="/targetRightSpeed")
+    @ResponseBody
+    public String UpdateTargetRightSpeed(@RequestParam("speed") double speed) {
+
+        logger.debug("Setting right wheel target speed: {}", speed);
+        speedControlThread.setRequiredSpeedRightWheel(speed);
+        return "OK";
+    }
+
     @GetMapping(path="/updatePidController")
     @ResponseBody
     public String UpdatePidController(@RequestParam("target") double target, @RequestParam("kp") double kp, @RequestParam("ki") double ki, @RequestParam("kd") double kd) {
