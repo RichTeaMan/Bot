@@ -41,6 +41,22 @@ function updateRightMotor(speed) {
     }
 }
 
+function updatePidController(target, kp, ki, kd) {
+    $.get(`/updatePidController?target=${target}&kp=${kp}&ki=${ki}&kd=${kd}`)
+    .fail(function(data) {
+        console.log("Failed to update PID controller:");
+        console.log(data);
+    });
+}
+
+function resetPidController() {
+    $.get(`/resetPidController`)
+    .fail(function(data) {
+        console.log("Failed to reset PID controller:");
+        console.log(data);
+    });
+}
+
 function fetchVideoImage(destinationElementId) {
     $(`#${destinationElementId}`).attr("src", "/cam?" + new Date().getTime());
 

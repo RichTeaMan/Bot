@@ -41,7 +41,7 @@ public class PidController {
     public double control(double desiredValue, double measuredValue, int durationMilliseconds) {
         double error = desiredValue - measuredValue;
         Integral = Integral + (error * durationMilliseconds);
-        clampIntegral();
+        //clampIntegral();
         double derivative = 0;
         if (durationMilliseconds > 0) {
             derivative = (error - PreviousError) / (double) durationMilliseconds;

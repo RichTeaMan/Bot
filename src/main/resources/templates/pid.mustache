@@ -1,0 +1,44 @@
+{{#layout}}
+    <div>
+        <input type="range" id="fpsRangeInput" min="0" max="100" value="15" onchange="createVideoStream(this.value);">
+        <input type="number" id="fpsTextInput" value="15" onchange="createVideoStream(this.value);">
+    </div>
+
+    <div>
+        <div>
+            <h3>Speed</h3>
+            <div id="speedDisplay"></div>
+        </div>
+        <h3>Target</h3>
+        <input type="number" id="targetSpeedInput" value="1.0" step="0.05" onchange="formUpdatePid();">
+        <h3>KP</h3>
+        <input type="number" id="kpInput" min="-1000" max="1000" value="0" onchange="formUpdatePid();">
+        <h3>KI</h3>
+        <input type="number" id="kiInput" min="-1000" max="1000" value="0" onchange="formUpdatePid();">
+        <h3>KD</h3>
+        <input type="number" id="kdInput" min="-1000" max="1000" value="0" onchange="formUpdatePid();">
+
+        <br />
+        <input type="button" id="resetInput" value="Reset PID" onclick="resetPidController();" >
+    <script>
+
+        function formUpdatePid() {
+            var target = $("#targetSpeedInput").val();
+            var kp = $("#kpInput").val();
+            var ki = $("#kiInput").val();
+            var kd = $("#kdInput").val();
+
+            updatePidController(target, kp, ki, kd);
+        }
+
+        setInterval(500, function() {
+            $.get("/revs1")
+                .done(function(data) {
+                    $("#speedDisplay").html(data);
+            });
+        });
+    </script>
+    <script type="text/javascript"
+            src="/resources/script/slider.js"></script>
+{{/layout}}
+{{>layout}}

@@ -26,4 +26,10 @@ public class HomeController {
         return new ModelAndView("home");
     }
 
+    @RequestMapping("/pid")
+    public ModelAndView pid() {
+        logger.info("PID called.");
+        return new ModelAndView("pid");
+    }
+
 }

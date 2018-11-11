@@ -50,13 +50,15 @@ public class VideoController {
             }
         }
         if (null != videoException || webcam == null) {
-            throw new IllegalStateException("Cannot instantiate video.", videoException);
+            //throw new IllegalStateException("Cannot instantiate video.", videoException);
         }
 
-        Dimension dimension = new Dimension(640, 480);
-        webcam.setViewSize(dimension);
+        if (webcam != null) {
+            Dimension dimension = new Dimension(640, 480);
+            webcam.setViewSize(dimension);
 
-        webcam.open();
+            webcam.open();
+        }
     }
 
     @PreDestroy

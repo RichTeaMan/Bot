@@ -1,7 +1,10 @@
 package com.github.richteaman.bot.controllers;
 
+import com.github.richteaman.bot.SpeedControlThread;
 import com.github.richteaman.bot.services.GpioService;
 import com.pi4j.io.gpio.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
@@ -10,16 +13,20 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.IOException;
-
 @Controller
 public class GpioRestController {
 
+    /** Logger. */
+    private final static Logger logger = LoggerFactory.getLogger(GpioRestController.class);
+
     private final GpioService gpioService;
 
+    private final SpeedControlThread speedControlThread;
+
     @Autowired
-    public GpioRestController(GpioService gpioService) {
+    public GpioRestController(GpioService gpioService, SpeedControlThread speedControlThread) {
         this.gpioService = gpioService;
+        this.speedControlThread = speedControlThread;
     }
 
     @GetMapping(path = "/gpio")
@@ -93,6 +100,32 @@ public class GpioRestController {
         int modulatedPwm = Math.abs(pwm);
 
         gpioService.getPwm2().setPwm(modulatedPwm);
+        return "OK";
+    }
+
+    @GetMapping(path="/updatePidController")
+    @ResponseBody
+    public String UpdatePidController(@RequestParam("target") double target, @RequestParam("kp") double kp, @RequestParam("ki") double ki, @RequestParam("kd") double kd) {
+
+        logger.debug("Target: %s, KP: %s, KI: %s, KD: %s", target, kp, ki, kd);
+
+        speedControlThread.setRequiredSpeed(target);
+        speedControlThread.getPid().Kp = kp;
+        speedControlThread.getPid().Ki = ki;
+        speedControlThread.getPid().Kd = kd;
+
+        return "OK";
+    }
+
+
+    @GetMapping(path="/resetPidController")
+    @ResponseBody
+    public String ResetPidController() {
+
+        logger.debug("Resetting PID controller");
+
+        speedControlThread.reset();
+
         return "OK";
     }
 
