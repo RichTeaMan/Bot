@@ -3,19 +3,28 @@ package com.github.richteaman.bot;
 import com.github.richteaman.bot.services.GpioService;
 import com.github.richteaman.bot.services.PidController;
 import com.pi4j.io.gpio.PinState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SpeedControlThread extends Thread {
 
-    private double requiredSpeed = 1.0;
+    /** Logger. */
+    private final static Logger logger = LoggerFactory.getLogger(SpeedControlThread.class);
+
+    private double requiredSpeedLeftWheel = 3.5;
+
+    private double requiredSpeedRightWheel = 3.5;
 
     private int sleepTime = 1;
 
     private GpioService gpioService;
 
-    private PidController pid = new PidController(0, 0, 0, PidController.Direction.DIRECT);
+    private PidController pidLeftWheel = new PidController(200, 0, 100, PidController.Direction.DIRECT);
+
+    private PidController pidRightWheel = new PidController(200, 0, 100, PidController.Direction.DIRECT);
 
     private boolean shouldReset = false;
 
@@ -26,27 +35,47 @@ public class SpeedControlThread extends Thread {
 
     public void run() {
 
-        pid.setOutputLimits(-1000, 1000);
-        pid.setTunings(0, 0, 0);
+        pidLeftWheel.setOutputLimits(-1000, 1000);
+        pidLeftWheel.setSampleTime(5);
+        pidLeftWheel.setMode(PidController.Mode.AUTOMATIC);
+
+        pidRightWheel.setOutputLimits(-1000, 1000);
+        pidRightWheel.setSampleTime(5);
+        pidRightWheel.setMode(PidController.Mode.AUTOMATIC);
 
         long lastTime = System.currentTimeMillis();
-        double lastOutput = 0;
+        double lastOutputLeftWheel = 0;
+        double lastOutputRightWheel = 0;
 
         while (true) {
 
             long currentTime = System.currentTimeMillis();
             long elapsed = currentTime - lastTime;
-            double revs = gpioService.getSpeedMonitor().getRevsPerSecond();
-            if (lastOutput < 0) {
+
+            double revsLeftWheel = gpioService.getSpeedMonitorLeftWheel().getRevsPerSecondQuarter();
+            if (lastOutputLeftWheel < 0) {
                 //revs = -revs;
             }
 
-            if (pid.compute(revs, requiredSpeed)) {
-                double output = pid.getLastOutput();
+            if (pidLeftWheel.compute(revsLeftWheel, requiredSpeedLeftWheel)) {
+                double output = pidLeftWheel.getLastOutput();
 
-                System.out.println(String.format("Target %s | Speed %s | Output %s | Elapsed %s", requiredSpeed, revs, output, elapsed));
+                logger.debug("Left - Target {} | Speed {} | Output {} | Elapsed {}", requiredSpeedLeftWheel, revsLeftWheel, output, elapsed);
+                UpdatePwm1((int) output);
+                lastOutputLeftWheel = output;
+            }
+
+            double revsRightWheel = gpioService.getSpeedMonitorRightWheel().getRevsPerSecondQuarter();
+            if (lastOutputRightWheel < 0) {
+                //revs = -revs;
+            }
+
+            if (pidRightWheel.compute(revsRightWheel, requiredSpeedRightWheel)) {
+                double output = pidRightWheel.getLastOutput();
+
+                logger.debug("Right - Target {} | Speed {} | Output {} | Elapsed {}", requiredSpeedRightWheel, revsRightWheel, output, elapsed);
                 UpdatePwm2((int) output);
-                lastOutput = output;
+                lastOutputRightWheel = output;
             }
             lastTime = currentTime;
 
@@ -71,6 +100,21 @@ public class SpeedControlThread extends Thread {
         shouldReset = true;
     }
 
+    private void UpdatePwm1(int pwm) {
+
+        gpioService.getPin0().setState(PinState.LOW);
+        gpioService.getPin3().setState(PinState.LOW);
+
+        if (pwm > 0) {
+            gpioService.getPin0().setState(PinState.HIGH);
+        } else if (pwm < 0) {
+            gpioService.getPin3().setState(PinState.HIGH);
+        }
+        int modulatedPwm = Math.abs(pwm);
+
+        gpioService.getPwm1().setPwm(modulatedPwm);
+    }
+
     private void UpdatePwm2(int pwm) {
 
         gpioService.getPin1().setState(PinState.LOW);
@@ -86,15 +130,15 @@ public class SpeedControlThread extends Thread {
         gpioService.getPwm2().setPwm(modulatedPwm);
     }
 
-    public double getRequiredSpeed() {
-        return requiredSpeed;
+    public double getRequiredSpeedRightWheel() {
+        return requiredSpeedRightWheel;
     }
 
-    public void setRequiredSpeed(double requiredSpeed) {
-        this.requiredSpeed = requiredSpeed;
+    public void setRequiredSpeedRightWheel(double requiredSpeedRightWheel) {
+        this.requiredSpeedRightWheel = requiredSpeedRightWheel;
     }
 
-    public PidController getPid() {
-        return pid;
+    public PidController getPidRightWheel() {
+        return pidRightWheel;
     }
 }

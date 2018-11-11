@@ -37,4 +37,17 @@ public class SpeedMonitor implements GpioPinListenerDigital {
         double revs = ((double)list.size()) / eventsPerRev;
         return revs;
     }
+
+    public double getRevsPerSecondQuarter() {
+
+        // get a second ago
+        long interval = System.currentTimeMillis() - 250L;
+        synchronized (this) {
+            List<Long> newList = list.stream().filter(t -> t > interval).collect(Collectors.toList());
+            list = newList;
+        }
+
+        double revs = ((double)list.size()) / eventsPerRev;
+        return revs * 4;
+    }
 }

@@ -22,11 +22,15 @@ private GpioController gpioController;
 
     private GpioPinDigitalInput pin25;
 
+    private GpioPinDigitalInput pin27;
+
     private GpioPinPwmOutput pwm1;
 
     private GpioPinPwmOutput pwm2;
 
-    private SpeedMonitor speedMonitor = new SpeedMonitor();
+    private SpeedMonitor speedMonitorLeftWheel = new SpeedMonitor();
+
+    private SpeedMonitor speedMonitorRightWheel = new SpeedMonitor();
 
     @PostConstruct
     public void init() {
@@ -47,8 +51,11 @@ private GpioController gpioController;
 
         pin25 = gpioController.provisionDigitalInputPin(RaspiPin.GPIO_25, PinPullResistance.PULL_DOWN);
         pin25.setShutdownOptions(true);
+        pin25.addListener(speedMonitorLeftWheel);
 
-        pin25.addListener(speedMonitor);
+        pin27 = gpioController.provisionDigitalInputPin(RaspiPin.GPIO_27, PinPullResistance.PULL_DOWN);
+        pin27.setShutdownOptions(true);
+        pin27.addListener(speedMonitorRightWheel);
 
         pwm1 = gpioController.provisionPwmOutputPin(RaspiPin.GPIO_23);
         pwm1.setPwm(0);
@@ -93,8 +100,11 @@ private GpioController gpioController;
         return pwm2;
     }
 
+    public SpeedMonitor getSpeedMonitorLeftWheel() {
+        return speedMonitorLeftWheel;
+    }
 
-    public SpeedMonitor getSpeedMonitor() {
-        return speedMonitor;
+    public SpeedMonitor getSpeedMonitorRightWheel() {
+        return speedMonitorRightWheel;
     }
 }

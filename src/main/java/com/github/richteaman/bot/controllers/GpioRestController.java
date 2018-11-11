@@ -107,10 +107,10 @@ public class GpioRestController {
     @ResponseBody
     public String UpdatePidController(@RequestParam("target") double target, @RequestParam("kp") double kp, @RequestParam("ki") double ki, @RequestParam("kd") double kd) {
 
-        logger.debug("Target: %s, KP: %s, KI: %s, KD: %s", target, kp, ki, kd);
+        logger.debug("Target: {}, KP: {}, KI: {}, KD: {}", target, kp, ki, kd);
 
-        speedControlThread.setRequiredSpeed(target);
-        speedControlThread.getPid().setTunings(kp, ki, kd);
+        speedControlThread.setRequiredSpeedRightWheel(target);
+        speedControlThread.getPidRightWheel().setTunings(kp, ki, kd);
 
         return "OK";
     }
@@ -141,7 +141,7 @@ public class GpioRestController {
     @ResponseBody
     public String FetchRevs() {
 
-        double revs = gpioService.getSpeedMonitor().getRevsPerSecond();
+        double revs = gpioService.getSpeedMonitorRightWheel().getRevsPerSecond();
 
         return String.valueOf(revs);
     }
