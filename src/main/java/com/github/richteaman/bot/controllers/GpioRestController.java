@@ -110,9 +110,7 @@ public class GpioRestController {
         logger.debug("Target: %s, KP: %s, KI: %s, KD: %s", target, kp, ki, kd);
 
         speedControlThread.setRequiredSpeed(target);
-        speedControlThread.getPid().Kp = kp;
-        speedControlThread.getPid().Ki = ki;
-        speedControlThread.getPid().Kd = kd;
+        speedControlThread.getPid().setTunings(kp, ki, kd);
 
         return "OK";
     }

@@ -1,6 +1,5 @@
 package com.github.richteaman.bot;
 
-import com.github.richteaman.bot.controllers.GpioRestController;
 import com.github.richteaman.bot.services.GpioService;
 import com.github.richteaman.bot.services.PidController;
 import com.pi4j.io.gpio.PinState;
@@ -16,7 +15,7 @@ public class SpeedControlThread extends Thread {
 
     private GpioService gpioService;
 
-    private PidController pid = new PidController();
+    private PidController pid = new PidController(0, 0, 0, PidController.Direction.DIRECT);
 
     private boolean shouldReset = false;
 
@@ -27,11 +26,8 @@ public class SpeedControlThread extends Thread {
 
     public void run() {
 
-        pid.MinOutput = -1000;
-        pid.MaxOutput = 1000;
-        pid.Kp = 0;
-        pid.Kd = 0;
-        pid.Ki = 0;
+        pid.setOutputLimits(-1000, 1000);
+        pid.setTunings(0, 0, 0);
 
         long lastTime = System.currentTimeMillis();
         double lastOutput = 0;
@@ -45,11 +41,13 @@ public class SpeedControlThread extends Thread {
                 //revs = -revs;
             }
 
-            double output = pid.control(requiredSpeed, revs, (int)elapsed);
-            System.out.println(String.format("Target %s | Speed %s | Output %s | Elapsed %s", requiredSpeed, revs, output, elapsed));
-            UpdatePwm2((int)output);
+            if (pid.compute(revs, requiredSpeed)) {
+                double output = pid.getLastOutput();
 
-            lastOutput = output;
+                System.out.println(String.format("Target %s | Speed %s | Output %s | Elapsed %s", requiredSpeed, revs, output, elapsed));
+                UpdatePwm2((int) output);
+                lastOutput = output;
+            }
             lastTime = currentTime;
 
             try {
@@ -59,7 +57,7 @@ public class SpeedControlThread extends Thread {
                     UpdatePwm2(0);
                     Thread.sleep(3000L);
                     shouldReset = false;
-                    lastOutput = 0;
+
                     lastTime = System.currentTimeMillis();
                 }
             } catch (InterruptedException e) {
