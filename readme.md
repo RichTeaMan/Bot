@@ -19,3 +19,10 @@ cd /tmp
 wget https://unicorn.drogon.net/wiringpi-2.46-1.deb
 sudo dpkg -i wiringpi-2.46-1.deb
 ```
+
+
+## Licence
+
+Licenced under MIT.
+
+The PID controller is inspired heavily by the [Arduino PID Library](https://github.com/br3ttb/Arduino-PID-Library).
