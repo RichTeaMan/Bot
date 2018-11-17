@@ -128,7 +128,7 @@ public class GpioRestController {
         logger.debug("Target: {}, KP: {}, KI: {}, KD: {}", target, kp, ki, kd);
 
         speedControlThread.setRequiredSpeedRightWheel(target);
-        speedControlThread.getPidRightWheel().setTunings(kp, ki, kd);
+        speedControlThread.getPidRightWheel().resetTunings(kp, ki, kd);
 
         return "OK";
     }

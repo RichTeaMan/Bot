@@ -1,73 +1,81 @@
 package com.github.richteaman.bot.services;
 
+/**
+ * PID controller.
+ */
 public class PidController {
 
-    private long millis() {
-        return System.currentTimeMillis();
-    }
+    /**
+     * Proportional Tuning Parameter.
+     */
+    private double kp;
 
-    double dispKp;                // * we'll hold on to the tuning parameters in user-entered
-    double dispKi;                //   format for display purposes
-    double dispKd;                //
+    /**
+     * Integral Tuning Parameter.
+     */
+    private double ki;
 
-    double kp;                  // * (P)roportional Tuning Parameter
-    double ki;                  // * (I)ntegral Tuning Parameter
-    double kd;                  // * (D)erivative Tuning Parameter
+    /**
+     * Derivative Tuning Parameter.
+     */
+    double kd;
 
-    Direction controllerDirection;
-    Proportional pOn;
-    Mode mode;
+    private Direction controllerDirection;
+    private Proportional pOn;
+    private Mode mode;
 
-    //double myInput;              // * Pointers to the Input, Output, and Setpoint variables
-    //double myOutput;             //   This creates a hard link between the variables and the
-    //double mySetpoint;           //   PID, freeing the user from having to constantly tell us
-    //   what these values are.  with pointers we'll just know.
+    private long lastTime;
+    private double lastOutput = 0;
+    private double outputSum;
+    private double lastInput;
 
-    long lastTime;
-    double lastOutput = 0;
-    double outputSum, lastInput;
-
-    long SampleTime;
-    double outMin, outMax;
-
-
-    /*Constructor (...)*********************************************************
-     *    The parameters specified here are those for for which we can't set up
-     *    reliable defaults, so we need to have the user set them.
-     ***************************************************************************/
-    public PidController(double Kp, double Ki, double Kd, Direction controllerDirection) {
-        mode = Mode.MANUAL;
-
-        setOutputLimits(0, 255);                //default output limit corresponds to
-        //the arduino pwm limits
-
-        SampleTime = 100;                            //default Controller Sample Time is 0.1 seconds
-
-        setControllerDirection(controllerDirection);
-        setTunings(Kp, Ki, Kd, Proportional.ProportionalOnError);
-
-        lastTime = millis() - SampleTime;
-    }
+    private long SampleTime;
+    private double outMin;
+    private double outMax;
 
 
     /**
-     * This, as they say, is where the magic happens.  this function should be called
-     * every time "void loop()" executes.  the function will decide for itself whether a new
-     * pid Output needs to be computed.  returns true when the output is computed,
-     * false when nothing has been done.
+     * PID controller constructor.
+     *
+     * @param Kp                  Proportional tuning parameter.
+     * @param Ki                  Integration tuning parameter.
+     * @param Kd                  Derivative tuning parameter.
+     * @param controllerDirection Controller direction.
+     */
+    public PidController(double Kp, double Ki, double Kd, Direction controllerDirection) {
+        mode = Mode.MANUAL;
+
+        setOutputLimits(0, 255);
+
+        //default Controller Sample Time is 0.1 seconds
+        SampleTime = 100;
+
+        setControllerDirection(controllerDirection);
+        resetTunings(Kp, Ki, Kd, Proportional.ProportionalOnError);
+
+        lastTime = System.currentTimeMillis() - SampleTime;
+    }
+
+    /**
+     * Performs a single execution of the PID loop. Returns true if changes have been made, or
+     * false if a loop execution was not required.
+     *
+     * @param input  Actual measurement.
+     * @param target Target.
+     * @return Boolean.
      */
     public boolean compute(double input, double target) {
         if (mode == Mode.MANUAL) return false;
-        long now = millis();
+        long now = System.currentTimeMillis();
         long timeChange = (now - lastTime);
         if (timeChange >= SampleTime) {
 
-            /*Compute all the working error variables*/
+            // compute all the working error variables
             double error = target - input;
             double dInput = (input - lastInput);
             outputSum += (ki * error);
 
-            /*Add Proportional on Measurement, if P_ON_M is specified*/
+            // add proportional on measurement, if P_ON_M is specified
             if (pOn == Proportional.ProportionalOnMeasurement) {
                 outputSum -= kp * dInput;
             }
@@ -75,7 +83,7 @@ public class PidController {
             if (outputSum > outMax) outputSum = outMax;
             else if (outputSum < outMin) outputSum = outMin;
 
-            /*Add Proportional on Error, if P_ON_E is specified*/
+            // add proportional on error if P_ON_E is specified
             double output;
             if (pOn == Proportional.ProportionalOnError) {
                 output = kp * error;
@@ -83,14 +91,12 @@ public class PidController {
                 output = 0;
             }
 
-            /*Compute Rest of PID Output*/
             output += outputSum - kd * dInput;
 
             if (output > outMax) output = outMax;
             else if (output < outMin) output = outMin;
             lastOutput = output;
 
-            // Remember some variables for next time
             lastInput = input;
             lastTime = now;
             return true;
@@ -100,19 +106,18 @@ public class PidController {
 
     }
 
-    /* SetTunings(...)*************************************************************
-     * This function allows the controller's dynamic performance to be adjusted.
-     * it's called automatically from the constructor, but tunings can also
-     * be adjusted on the fly during normal operation
-     ******************************************************************************/
-    public void setTunings(double Kp, double Ki, double Kd, Proportional proportional) {
+    /**
+     * Reset tunings to specified values.
+     *
+     * @param Kp           Proportional.
+     * @param Ki           Integration.
+     * @param Kd           Derivative.
+     * @param proportional Proportional gain type.
+     */
+    public void resetTunings(double Kp, double Ki, double Kd, Proportional proportional) {
         if (Kp < 0 || Ki < 0 || Kd < 0) return;
 
         pOn = proportional;
-
-        dispKp = Kp;
-        dispKi = Ki;
-        dispKd = Kd;
 
         double SampleTimeInSec = ((double) SampleTime) / 1000;
         kp = Kp;
@@ -127,41 +132,39 @@ public class PidController {
     }
 
     /**
-     * Set Tunings using the last-rembered POn setting.
+     * Set Tunings using the last-remembered proportional setting.
      *
-     * @param Kp
-     * @param Ki
-     * @param Kd
+     * @param Kp Proportional.
+     * @param Ki Integration.
+     * @param Kd Derivative.
      */
-    public void setTunings(double Kp, double Ki, double Kd) {
-        setTunings(Kp, Ki, Kd, pOn);
+    public void resetTunings(double Kp, double Ki, double Kd) {
+        resetTunings(Kp, Ki, Kd, pOn);
     }
 
     /**
      * Sets the period, in Milliseconds, at which the calculation is performed.
      */
-    public void setSampleTime(int NewSampleTime) {
-        if (NewSampleTime > 0) {
-            double ratio = (double) NewSampleTime
+    public void setSampleTime(int newSampleTime) {
+        if (newSampleTime > 0) {
+            double ratio = (double) newSampleTime
                     / (double) SampleTime;
             ki *= ratio;
             kd /= ratio;
-            SampleTime = (long) NewSampleTime;
+            SampleTime = (long) newSampleTime;
         }
     }
 
     /**
-     * This function will be used far more often than SetInputLimits.  while
-     * the input to the controller will generally be in the 0-1023 range (which is
-     * the default already,)  the output will be a little different.  maybe they'll
-     * be doing a time window and will need 0-8000 or something.  or maybe they'll
-     * want to clamp it from 0-125.  who knows.  at any rate, that can all be done
-     * here.
+     * Set output limits for the controller.
+     *
+     * @param min Minimum value.
+     * @param max Maximum value.
      */
-    public void setOutputLimits(double Min, double Max) {
-        if (Min >= Max) return;
-        outMin = Min;
-        outMax = Max;
+    public void setOutputLimits(double min, double max) {
+        if (min >= max) return;
+        outMin = min;
+        outMax = max;
 
         if (mode == Mode.AUTOMATIC) {
             if (lastOutput > outMax) lastOutput = outMax;
@@ -173,23 +176,24 @@ public class PidController {
     }
 
     /**
-     * Allows the controller Mode to be set to manual (0) or Automatic (non-zero)
+     * Allows the controller mode to be set to manual or automatic
      * when the transition from manual to auto occurs, the controller is
      * automatically initialized.
+     *
+     * @param mode Mode.
      */
     public void setMode(Mode mode) {
         boolean newAuto = mode == Mode.AUTOMATIC;
         if (this.mode == Mode.MANUAL && mode == Mode.AUTOMATIC) {  /*we just went from manual to auto*/
-            initialize();
+            initialise();
         }
         this.mode = mode;
     }
 
-    /* Initialize()****************************************************************
-     *	does all the things that need to happen to ensure a bumpless transfer
-     *  from manual to automatic mode.
-     ******************************************************************************/
-    void initialize() {
+    /**
+     * Initialise controller.
+     */
+    private void initialise() {
         outputSum = lastOutput;
 
         // Ideally this would reread input
@@ -200,12 +204,9 @@ public class PidController {
     }
 
     /**
-     * The PID will either be connected to a DIRECT acting process (+Output leads
-     * to +Input) or a REVERSE acting process(+Output leads to -Input.)  we need to
-     * know which one, because otherwise we may increase the output when we should
-     * be decreasing.  This is called from the constructor.
+     * Sets controller direction, adjusting constants as necessary.
      */
-    void setControllerDirection(Direction direction) {
+    private void setControllerDirection(Direction direction) {
         if (mode == Mode.AUTOMATIC && direction != controllerDirection) {
             kp = (0 - kp);
             ki = (0 - ki);
@@ -214,46 +215,53 @@ public class PidController {
         controllerDirection = direction;
     }
 
-    /* Status Funcions*************************************************************
-     * Just because you set the Kp=-1 doesn't mean it actually happened.  these
-     * functions query the internal state of the PID.  they're here for display
-     * purposes.  this are the functions the PID Front-end uses for example
-     ******************************************************************************/
-    public double getKp() {
-        return dispKp;
-    }
-
-    public double getKi() {
-        return dispKi;
-    }
-
-    public double getKd() {
-        return dispKd;
-    }
-
+    /**
+     * Gets mode.
+     *
+     * @return Mode.
+     */
     public Mode getMode() {
         return mode;
     }
 
+    /**
+     * Gets direction.
+     *
+     * @return Direction.
+     */
     public Direction getDirection() {
         return controllerDirection;
     }
 
+    /**
+     * Gets last output. This is the controller result to pass to the system.
+     *
+     * @return Output.
+     */
     public double getLastOutput() {
         return lastOutput;
     }
 
+    /**
+     * Controller mode.
+     */
     public enum Mode {
         AUTOMATIC,
         MANUAL
     }
 
+    /**
+     * Controller direction.
+     */
     public enum Direction {
 
         DIRECT,
         REVERSE
     }
 
+    /**
+     * Proportional gain type.
+     */
     public enum Proportional {
         ProportionalOnMeasurement,
         ProportionalOnError
