@@ -1,6 +1,9 @@
+packerlog.txt
+*.img
 */target/
 !/*/.mvn/wrapper/maven-wrapper.jar
 */logs/
+packer_cache/
 
 ### STS ###
 .apt_generated
